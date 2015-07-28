@@ -3,9 +3,7 @@ package ru.yandex.qatools.allure.teamcity;
 import jetbrains.buildServer.serverSide.BuildFeature;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -30,13 +28,11 @@ public class AllureBuildFeature extends BuildFeature {
         return "Allure Report Generation";
     }
 
-    @Nullable
     @Override
     public String getEditParametersUrl() {
         return pluginDescriptor.getPluginResourcesPath("allureSettings.jsp");
     }
 
-    @org.jetbrains.annotations.Nullable
     public Map<String, String> getDefaultParameters() {
         return AllureReportConfig.newDefaultConfig().getParameters();
     }

@@ -1,22 +1,27 @@
 package ru.yandex.qatools.allure.teamcity;
 
+import jetbrains.buildServer.agent.AgentBuildFeature;
+import jetbrains.buildServer.agent.AgentLifeCycleAdapter;
+import jetbrains.buildServer.agent.AgentLifeCycleListener;
+import jetbrains.buildServer.agent.AgentRunningBuild;
+import jetbrains.buildServer.agent.BuildFinishedStatus;
+import jetbrains.buildServer.agent.BuildProgressLogger;
 import jetbrains.buildServer.agent.artifacts.ArtifactsWatcher;
-import ru.yandex.qatools.allure.report.AllureReportBuilder;
 import jetbrains.buildServer.messages.DefaultMessagesInfo;
 import jetbrains.buildServer.util.EventDispatcher;
 import org.jetbrains.annotations.NotNull;
-import jetbrains.buildServer.agent.*;
-import ru.yandex.qatools.allure.report.utils.AetherObjectFactory;
-import ru.yandex.qatools.allure.report.utils.DependencyResolver;
+import ru.yandex.qatools.allure.report.AllureReportBuilder;
 
 import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Arrays;
-
-import static ru.yandex.qatools.allure.report.utils.AetherObjectFactory.newDependencyResolver;
 
 public class AgentBuildEventsProvider extends AgentLifeCycleAdapter {
 
     public static final String ALLURE_ACTIVITY_NAME = "Allure report generation";
+
+    public static final ClassLoader PARENT = createParent();
 
     private final ArtifactsWatcher artifactsWatcher;
 
@@ -68,10 +73,8 @@ public class AgentBuildEventsProvider extends AgentLifeCycleAdapter {
 
             logger.message(String.format("prepare report generator with version: %s", version));
 
-            File repositoriesDirectory = new File(tempDirectory, AllureReportConfig.REPOSITORY_PATH);
-            DependencyResolver dependencyResolver = newDependencyResolver(repositoriesDirectory,
-                    AetherObjectFactory.MAVEN_CENTRAL_URL, AetherObjectFactory.SONATYPE_RELEASES_URL);
-            AllureReportBuilder builder = new AllureReportBuilder(version, allureReportDirectory, dependencyResolver);
+            AllureReportBuilder builder = new AllureReportBuilder(version, allureReportDirectory);
+            builder.setClassLoader(PARENT);
 
             logger.message(String.format("process tests results to directory [%s]",
                     allureReportDirectory.getAbsolutePath()));
@@ -116,5 +119,11 @@ public class AgentBuildEventsProvider extends AgentLifeCycleAdapter {
             }
         }
         return null;
+    }
+
+    private static ClassLoader createParent() {
+        return new URLClassLoader(new URL[]{
+                AgentBuildEventsProvider.class.getClassLoader().getResource("groovy-all-2.4.3-indy.jar")
+        }, null);
     }
 }
