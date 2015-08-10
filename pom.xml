@@ -95,6 +95,7 @@
                 <configuration>
                     <teamcityDir>.teamcity/${teamcity-version}</teamcityDir>
                     <agentDebugStr>-Xmx2048m -XX:MaxPermSize=512m</agentDebugStr>
+                    <!-- -agentpath:/Applications/jprofiler8/bin/macos/libjprofilerti.jnilib=nowait,port=8849-->
                 </configuration>
             </plugin>
         </plugins>
