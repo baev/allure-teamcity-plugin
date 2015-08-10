@@ -13,4 +13,8 @@ public final class AllureConstants {
 
     public static final String RUN_TYPE = "allureReportGeneratorRunner";
 
+    public static final String REPORT_VERSION = "allure.version";
+
+    public static final String ISSUE_TRACKER_PATTERN = "allure.issues.tracker.pattern";
+    public static final String TMS_PATTERN = "allure.tests.management.pattern";
 }

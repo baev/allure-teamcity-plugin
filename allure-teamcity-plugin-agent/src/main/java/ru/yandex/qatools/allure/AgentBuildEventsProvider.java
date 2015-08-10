@@ -10,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
+import static ru.yandex.qatools.allure.AllureBuildServiceAdapter.ALLURE_REPORT;
+
 /**
  * @author Dmitry Baev charlie@yandex-team.ru
  *         Date: 10.08.15
@@ -30,7 +32,7 @@ public class AgentBuildEventsProvider extends AgentLifeCycleAdapter {
             return;
         }
 
-        File reportDirectory = new File(runner.getBuild().getBuildTempDirectory(), "allure-report");
+        File reportDirectory = new File(runner.getBuild().getBuildTempDirectory(), ALLURE_REPORT);
         artifactsWatcher.addNewArtifactsPath(reportDirectory.getAbsolutePath());
     }
 }

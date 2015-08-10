@@ -3,5 +3,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <div class="parameter">
-    YAHHOO
+    ReportVersion:<strong><props:displayValue name="<%=AllureConstants.REPORT_VERSION%>" emptyValue="none"/></strong>
+</div>
+<div class="parameter">
+    Issue tracker pattern:<strong><props:displayValue name="<%=AllureConstants.ISSUE_TRACKER_PATTERN%>" emptyValue="none"/></strong>
+</div>
+<div class="parameter">
+    TMS pattern:<strong><props:displayValue name="<%=AllureConstants.TMS_PATTERN%>" emptyValue="none"/></strong>
 </div>
