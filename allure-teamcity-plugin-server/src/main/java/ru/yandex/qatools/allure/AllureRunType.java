@@ -6,8 +6,16 @@ import jetbrains.buildServer.serverSide.RunTypeRegistry;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -65,5 +73,20 @@ public class AllureRunType extends RunType {
     @Override
     public Map<String, String> getDefaultRunnerProperties() {
         return new HashMap<>();
+    }
+
+    public String getPluginsDirectory() {
+        return pluginDescriptor.getPluginRoot().getParent();
+    }
+
+    public List<String> installedVersions() throws IOException {
+        List<String> result = new ArrayList<>();
+        Path path = Paths.get(pluginDescriptor.getPluginRoot().getParent(), ".tools", "allure");
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+            for (Path child : stream) {
+                result.add(child.getFileName().toString());
+            }
+        }
+        return result;
     }
 }

@@ -17,4 +17,7 @@ public final class AllureConstants {
 
     public static final String ISSUE_TRACKER_PATTERN = "allure.issues.tracker.pattern";
     public static final String TMS_PATTERN = "allure.tests.management.pattern";
+    public static final String SELECT = "allure.select";
+
+    public static final String ALLURE_ADMIN_VERSIONS = "allureAdminVersions";
 }
