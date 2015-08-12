@@ -3,5 +3,4 @@
 <beans default-autowire="constructor">
     <bean id="allureRunType" class="ru.yandex.qatools.allure.AllureRunType"/>
     <bean id="selectItems" class="ru.yandex.qatools.allure.SelectItems"/>
-    <bean id="allureDownloadPage" class="ru.yandex.qatools.allure.AllureConfigurationPage"/>
 </beans>

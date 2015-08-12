@@ -2,6 +2,7 @@ package ru.yandex.qatools.allure;
 
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.ToolCannotBeFoundException;
+import jetbrains.buildServer.agent.artifacts.ArtifactsWatcher;
 import jetbrains.buildServer.agent.runner.BuildServiceAdapter;
 import jetbrains.buildServer.agent.runner.ProgramCommandLine;
 import org.jetbrains.annotations.NotNull;
@@ -9,10 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import static ru.yandex.qatools.allure.AllureConstants.ISSUE_TRACKER_PATTERN;
 import static ru.yandex.qatools.allure.AllureConstants.REPORT_VERSION;
@@ -26,13 +25,22 @@ public class AllureBuildServiceAdapter extends BuildServiceAdapter {
 
     public static final String BUNDLE = "allure-bundle.jar";
 
-    public static final String ALLURE_TOOL_NAME = "allure";
-
     public static final String JAVA_HOME = "JAVA_HOME";
 
     public static final String TEAMCITY_TOOL_ALLURE = "teamcity.tool.allure";
 
     public static final String ALLURE_REPORT = "allure-report";
+
+    private final ArtifactsWatcher artifactsWatcher;
+
+    public AllureBuildServiceAdapter(@NotNull final ArtifactsWatcher artifactsWatcher) {
+        this.artifactsWatcher = artifactsWatcher;
+    }
+
+    @NotNull
+    private String getReportDirectory() {
+        return new File(getBuildTempDirectory(), ALLURE_REPORT).getAbsolutePath();
+    }
 
     @NotNull
     @Override
@@ -46,14 +54,13 @@ public class AllureBuildServiceAdapter extends BuildServiceAdapter {
         String reportVersion = getRunnerParameters().get(REPORT_VERSION);
         getLogger().message("Generate Allure report version " + reportVersion);
 
-        String allureDirectory = getAllureDirectory();
+        String allureDirectory = getToolPath("allure");
         getLogger().message("Allure tool found: " + allureDirectory);
 
         String javaExecutable = getJavaExecutable();
         getLogger().message("Java executable found: " + javaExecutable);
 
         Path bundle = Paths.get(allureDirectory, BUNDLE);
-        File reportDirectory = new File(getBuildTempDirectory(), ALLURE_REPORT);
 
         List<String> args = Arrays.asList(
                 createSystemPropertyArgument(issuesPattern, ISSUE_TRACKER_PATTERN),
@@ -61,10 +68,15 @@ public class AllureBuildServiceAdapter extends BuildServiceAdapter {
                 "-jar",
                 bundle.toAbsolutePath().toString(),
                 "/Users/charlie/IdeaProjects/allure-teamcity-plugin/allure-results",
-                reportDirectory.getAbsolutePath()
+                getReportDirectory()
         );
 
         return createProgramCommandline(javaExecutable, args);
+    }
+
+    @Override
+    public void afterProcessSuccessfullyFinished() throws RunBuildException {
+        artifactsWatcher.addNewArtifactsPath(getReportDirectory());
     }
 
     protected String createSystemPropertyArgument(String key, String value) {
@@ -79,7 +91,7 @@ public class AllureBuildServiceAdapter extends BuildServiceAdapter {
 
     protected String getAllureDirectory() throws ToolCannotBeFoundException {
         if (!getConfigParameters().containsKey(TEAMCITY_TOOL_ALLURE)) {
-            throw new ToolCannotBeFoundException("Could not tool by name: allure");
+            throw new ToolCannotBeFoundException("Could not find tool by name: allure");
         }
 
         return getConfigParameters().get(TEAMCITY_TOOL_ALLURE);
